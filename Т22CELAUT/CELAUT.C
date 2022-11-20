@@ -35,7 +35,7 @@ void NewGeneration( byte *F1, byte *F2 )
       if (c[4] == 1 || c[4] == 2)                          
       {
         for (i = 0; i < 4; i++)
-          n += (c[i] ? 1 : 0);  ///number of inactive cells   2 -> -1
+          n += (c[i] ? 0 : 1);  ///number of inactive cells   2 -> -1
         if (n == 0)
           SetCell(F2, x, y, (rand() % 2 + 1));
         else
@@ -54,7 +54,7 @@ void NewGeneration( byte *F1, byte *F2 )
         if ((rand() % 10000) == 4353) 
           SetCell(F2, x, y, (rand() % 2 + 1));  ///independent spin change pe        
         for (i = 0; i < 4; i++)
-          n += (c[i] ? 1 : 0); ///n -> inactive
+          n += (c[i] ? 0 : 1); ///n -> inactive
         if (n != 4)            ///have active cells at the neighbours 
         {
           for (n = 4 - n; n > 0; n--)
