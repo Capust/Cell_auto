@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Т22CELAUT", "Т22CELAUT\Т22CELAUT.vcproj", "{BB9C7BE1-1FDD-4F8D-B7BA-363D9E934906}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB9C7BE1-1FDD-4F8D-B7BA-363D9E934906}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB9C7BE1-1FDD-4F8D-B7BA-363D9E934906}.Debug|Win32.Build.0 = Debug|Win32
+		{BB9C7BE1-1FDD-4F8D-B7BA-363D9E934906}.Release|Win32.ActiveCfg = Release|Win32
+		{BB9C7BE1-1FDD-4F8D-B7BA-363D9E934906}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
