@@ -17,29 +17,12 @@ void Display( void )
   glutSwapBuffers();
   glutPostRedisplay();
   printf("+1 iteration\n");
-  getchar();
 }
 
 void Keyboard( byte Key, int x, int y )
 {
   if (Key == 27)
     exit(30);
-  if (Key == 49)
-  {
-    printf("Block has been spawned\n");
-    BlockSpawn(F1, x, y);
-  }
-  if (Key == 50)
-  {
-    printf("Blinker has been spawned at (%i; %i)\n", FRAME_H - y / GLUT_WINDOW_HEIGHT, FRAME_W - x / GLUT_WINDOW_WIDTH);
-    BlinkerSpawn(F1, x, y);
-  }
- /* if (Key == (byte)'k')
-  {
-    printf("All cells have been killed\n");
-    memset(F1, 0, FRAME_W * FRAME_H);
-    memset(F2, 0, FRAME_W * FRAME_H);
-  }*/
 }
 
 void main( int argc, char *argv[] )

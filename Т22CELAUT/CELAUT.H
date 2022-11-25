@@ -4,8 +4,9 @@
 
 #define FRAME_W 512
 #define FRAME_H 128
-#define ph 485
-
+#define PH 750
+#define PE 2
+#define PD 500
                                               
 typedef unsigned char byte;
 
@@ -18,5 +19,4 @@ int GetCell( byte *F, int x, int y );
 int GetNeighbours( byte *F, int x, int y );
 void PutPixel( int x, int y, byte b, byte g, byte r );
 void FieldInit( byte *F );
-void BlockSpawn( byte *F, int x, int y );
-void BlinkerSpawn( byte *F, int x, int y );
+int random_gen( int p );

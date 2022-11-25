@@ -1,5 +1,13 @@
 #include "CELAUT.H"
 
+int random_gen( int p )
+{
+  if ((rand() % 10000) >= (p - 1))   /// P+ => 1
+    return 0;
+  else 
+    return 1;
+  
+}
 void FieldDraw( byte *F )
 {
   int x, y, H = FRAME_H, W = FRAME_W;
@@ -21,7 +29,7 @@ void FieldDraw( byte *F )
 
 void NewGeneration( byte *F1, byte *F2 )
 {
-  int x, y, H = FRAME_H, W = FRAME_W, c[5], value = 0, i, n;
+  int x, y, H = FRAME_H, W = FRAME_W, c[5], value = 0, i, n, m;
 
   for (y = 0; y < H; y++)                                    
     for (x = 0; x < W; x++)
@@ -41,7 +49,7 @@ void NewGeneration( byte *F1, byte *F2 )
         else
         {
           for (; n > 0; n--)
-            value += ((rand() % 100) > 5) ? 0 : 1;    ///pd->0.05
+            value += random_gen(PD);    ///pd->0.05
           if (value)
             SetCell(F2, x, y, 0);
           else 
@@ -51,24 +59,25 @@ void NewGeneration( byte *F1, byte *F2 )
       else
       {
         n = 0;
-        if ((rand() % 10000) == 4353) 
-          SetCell(F2, x, y, (rand() % 2 + 1));  ///independent spin change pe        
-        for (i = 0; i < 4; i++)
-          n += (c[i] ? 0 : 1); ///n -> inactive
-        if (n != 4)            ///have active cells at the neighbours 
+        if (random_gen(PE)) 
+          SetCell(F2, x, y, (rand() % 2) + 1);
+        else///independent spin change pe        
         {
-          for (n = 4 - n; n > 0; n--)
-            value += ((rand() % 10000) > (ph - 1)) ? 0 : 1;    
-          if (value)
-            SetCell(F2, x, y, (rand() % 2 + 1));
-          else 
+          for (i = 0; i < 4; i++)
+            n += (c[i] ? 0 : 1); ///n -> inactive
+          if (n != 4)            ///have active cells at the neighbours 
           {
-            SetCell(F2, x, y, 0);
+            value = 0;
+            for (m = 4 - n; m > 0; m--)
+              value += random_gen(PH) ? 1 : 0;    
+            if (value)
+              SetCell(F2, x, y, (rand() % 2 + 1));
+            else 
+              SetCell(F2, x, y, 0);
           }
+          else
+            SetCell(F2, x, y, 0);
         }
-        else
-          SetCell(F2, x, y, 0);
-
       }
     }
 }
@@ -94,13 +103,8 @@ int GetCell( byte *F, int x, int y )
 
   x = (x + W) % W;   ///donut
   y = (y + H) % H;
-  return F[y * W + x];
+  return F[y * W + x];   ///012
 }
-
-/*int GetNeighbours( byte *F, int x, int y )
-{
-  return GetCell(F, x + 1, y) + GetCell(F, x, y + 1) + GetCell(F, x - 1, y) + GetCell(F, x, y - 1);
-}*/
 
 void PutPixel( int x, int y, byte b, byte g, byte r )
 {
@@ -114,34 +118,14 @@ void FieldInit( byte *F )       ///+problem: reduction in the population of acti
   int x, y, H = FRAME_H, W = FRAME_W;
 
   for (y = 0; y < H; y++)
+  {
     for (x = 0; x < W; x++)
     {
-      if ((rand() % 50) == 1)
+      if ((rand() % 20) == 1)
         F[y * W + x] = ((rand() % 3));     ///-> +-1/0
       else
         F[y * W + x] = 0;
     }
+  }
 }
 
-void BlockSpawn( byte *F, int x, int y )
-{
-  int H = FRAME_H, W = FRAME_W;
-
-  x = H - y / GLUT_WINDOW_HEIGHT;
-  y = W - x / GLUT_WINDOW_WIDTH;
-  SetCell(F, x, y, 1);
-  SetCell(F, x + 1, y, 1);
-  SetCell(F, x, y + 1, 1);
-  SetCell(F, x + 1, y + 1, 1);
-}
-
-void BlinkerSpawn( byte *F, int x, int y )
-{
-  int H = FRAME_H, W = FRAME_W;
-
-  x = H - y / GLUT_WINDOW_HEIGHT;
-  y = W - x / GLUT_WINDOW_WIDTH;
-  SetCell(F, x, y, 1);
-  SetCell(F, x, y - 1, 1);
-  SetCell(F, x, y + 1, 1);
-}
