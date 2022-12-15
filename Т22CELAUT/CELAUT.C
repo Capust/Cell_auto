@@ -21,7 +21,7 @@ void FieldDraw( byte *F )
       {
         if(GetCell(F, x, y) == 2)                       
           PutPixel(x, y, 122, 12, 30);
-        else
+        else if (GetCell(F, x, y) == 0)
           PutPixel(x, y, 255, 255, 255);
       }
     }
@@ -33,7 +33,7 @@ void NewGeneration( byte *F1, byte *F2 )
   
   for (y = 0; y < H; y += (H - 1))
   {
-    for (x = 0; x < H; x += (H - 1))
+    for (x = 0; x < W; x += (W - 1))
     {
       n = 0;
       switch (l)
@@ -312,10 +312,13 @@ int GetCell( byte *F, int x, int y )
 {
   int W = FRAME_W, H = FRAME_H;
 
+  if (x < 0 || y < 0)
+    return 0;
  /// x = (x + W) % W;   ///donut
  /// y = (y + H) % H;
   return F[y * W + x];   ///012
 }
+
 
 void PutPixel( int x, int y, byte b, byte g, byte r )
 {
@@ -332,7 +335,7 @@ void FieldInit( byte *F )
   {
     for (x = 0; x < W; x++)
     {
-      if ((rand() % 40) == 1)
+      if ((rand() % 2) == 1)
         F[y * W + x] = ((rand() % 3));  
       else
         F[y * W + x] = 0;
@@ -365,67 +368,133 @@ int Print_file( byte *F )
   fclose(filename);
   return 1;
 }
-
-void Clacter_lab( byte *F1, int *F2 )
+void Claster_lab( byte *F3, int *labels )
 {
   int y, x;
-  int largest_label = 0, labels[FRAME_W * FRAME_H], i, left, below; 
+  int largest_label = 0, i, left, below; 
 
-  for (i = 0; i < FRAME_W * FRAME_H; i++)
-  {
+  for (i = 0; i < FRAME_H * FRAME_W; i++)
     labels[i] = 0;
-  }
 
-  for (y = 1; y < FRAME_H; y++)
+  for (y = 0; y < FRAME_H + 1; y++)
   {
-    for (x = 1; x < FRAME_W; x++)
+    for (x = 0; x < FRAME_W + 1; x++)
     {
-      if ((GetCell(F1, x, y) == 1) || (GetCell(F1, x, y) == 2))
+      if ((GetCell(F3, x, y) == 1) || (GetCell(F3, x, y) == 2))
       {
-        left = GetCell(F1, x - 1, y);
-        below = GetCell(F1, x, y - 1);
-
-        if ((left == 0) || (below == 0))
+        left = GetCell(F3, x - 1, y);
+        below = GetCell(F3, x, y - 1);
+       /// printf("L %i| %i |B %i, x: %i, y: %i\n",  left,F3[x + y * (FRAME_W + 1)], below, x - 1, y - 1);
+        if ((left == 0) && (below == 0))
         {
           largest_label = largest_label + 1;
-          F2[x + y * FRAME_H] = largest_label;
+          labels[x + y * FRAME_W] = largest_label;
         }
         else 
         {
           if ((left != 0) && (below == 0)) 
-            F2[x + y * FRAME_H] = find(left, labels);
+            labels[x + y * FRAME_W] = labels[(x - 1) + y * FRAME_W];
           else
           {
             if ((left == 0) && (below != 0))
-              F2[x + y * FRAME_H] = find(below, labels);
+              labels[x + y * FRAME_W] = labels[x + (y - 1) * FRAME_W];
             else        
             {
-              uni(left, below, labels);
-              F2[x + y * FRAME_H] = find(left, labels);
+              labels[x + y * FRAME_W] = find(x + y * FRAME_W, labels[(x - 1) + y * FRAME_W], labels[x + (y - 1) * FRAME_W], labels);
             }
           }
         }
-      }
-    }
-  } 
+      } 
+    }   
+  }
 }
-void uni( int x, int y, int *labels )
+
+int find(int n, int x, int y, int *labels )
+{
+  int i;
+
+  for (i = 0; i < n; i++)
+  {
+    if (labels[i] = y)
+      labels[i] = x;
+  }
+  return x;
+}
+
+/*
+void Claster_lab( byte *F3, int *labels )
+{
+  int y, x, x1, y1;
+  int largest_label = 0, i, left, below; 
+
+  for (i = 0; i < FRAME_H*FRAME_W; i++)
+    labels[i] = 0;
+
+  for (y = 1; y < FRAME_H + 1; y++)
+  {
+    for (x = 1; x < FRAME_W + 1; x++)
+    {
+      x1 = x - 1;
+      y1 = y - 1;
+      if ((F3[x + y * (FRAME_W + 1)] == 1) || (F3[x + y * (FRAME_W + 1)] == 2))
+      {
+        left = F3[x1 + y * (FRAME_W + 1)];
+        below = F3[x + y1 * (FRAME_W + 1)];
+       /// printf("L %i| %i |B %i, x: %i, y: %i\n",  left,F3[x + y * (FRAME_W + 1)], below, x - 1, y - 1);
+        if ((left == 0) && (below == 0))
+        {
+          largest_label = largest_label + 1;
+          labels[x1 + y1 * FRAME_W] = largest_label;
+        }
+        else 
+        {
+          if ((left != 0) && (below == 0)) 
+            labels[x1 + y1 * FRAME_W] = labels[(x1 - 1) + y1 * FRAME_W];
+          else
+          {
+            if ((left == 0) && (below != 0))
+              labels[x1 + y1 * FRAME_W] = labels[x1 + (y1 - 1) * FRAME_W];
+            else        
+            {
+              labels[x1 + y1 * FRAME_W] = find(x1 + y1 * FRAME_W, labels[(x1 - 1) + y1 * FRAME_W], labels[x1 + (y1 - 1) * FRAME_W], labels);
+            }
+          }
+        }
+      } 
+    }   
+  }
+  printf("\n");
+}
+/*void uni( int x, int y, int *labels )
 {
   labels[find(x, labels)] = find(y, labels);
-}
-
-int find( int x, int *labels )
+}*/
+/*
+int find(int n, int x, int y, int *labels )
 {
-  int y = x;
+  int i;
 
-  while (labels[y] != y)
-    y = labels[y];
-  while (labels[x] != x)
+  for (i = 0; i < n; i++)
   {
-    int z = labels[x];
-    
-    labels[x] = y;
-    x = z;
+    if (labels[i] = y)
+      labels[i] = x;
   }
-  return y;
+  return x;
 }
+void Copy_of_F( byte *Copy, byte *F )
+{
+  int i, k = 0;
+
+  for (i = 0; i < FRAME_W + 1; i++)
+    Copy[i] = 0;
+  for (i = FRAME_W + 1; i < (FRAME_W + 1) * (FRAME_H + 1); i++)
+  {
+    if (i % (FRAME_W + 1) == 0)
+    {
+      Copy[i] = 0;
+      k++;
+    }
+    else
+      Copy[i] = F[i - FRAME_W - 1 - k];
+  }
+}*/
